@@ -4,9 +4,9 @@ HOMEWORK 2
 
 Due: Wed Feb 16, 2022 (23h59)
 
-Name: 
+Name: Melody Chiu
 
-Email:
+Email: cchiu@olin.edu
 
 Remarks, if any:
 
@@ -134,19 +134,39 @@ let countTransitions (m:fa) (q:int) (a:char):int =
 
 
 let rec isFinal (m:fa) (q:int):bool = 
-  failwith "Not implemented"
+  if m.final = [q] then true
+  else false
 
-  
-let rec followSymbol (m:fa) (q:int) (a:char):int = 
-  failwith "Not implemented"
+let rec makeTransition trs q a =
+  match trs with
+  | [] -> 0
+  | t :: trs' -> (match t with
+                    (q', a', p') -> if q = q' && a = a'
+                                    then p'
+                                    else makeTransition trs' q a)
 
-  
-let rec followString (m:fa) (q:int) (syms: char list):int =
-  failwith "Not implemented"
+let followSymbol (m:fa) (q:int) (a:char):int =
+  if (countTransitions m q a) = 0 || (countTransitions m q a) > 1 then failwith "No/more than one transition(s) possible"
+  else makeTransition m.delta q a
 
+let followString (m:fa) (q:int) (syms: char list):int =
+  let rec loop symbols start =
+    match symbols with
+    | [] -> start
+    | x :: xs' -> loop xs' (makeTransition m.delta start x) in
+  loop syms q
+
+let followString (m:fa) (q:int) (syms: char list):int =
+  let rec loop symbols start =
+    match symbols with
+    | [] -> start
+    | x :: xs' -> if xs' = [] then makeTransition m.delta start x
+                  else loop xs' (makeTransition m.delta start x) in
+  loop syms q
   
 let rec accept (m:fa) (input:string):bool = 
-  failwith "Not implemented"
+  let symbols = explode input in
+  isFinal m (followString m m.start symbols)
 
 
 (* QUESTION 2 *)
@@ -160,19 +180,104 @@ let dummy : fa = { states = [0];
                    start = 0;
                    final = []}
 
-let fa_a : fa = dummy
-                    
+let fa_a : fa = { states = [1; 2; 3];
+                  alphabet = ['a';'b';'c'];
+                  delta = [(1,'a',3);
+                           (1,'b',3);
+                           (1,'c',3);
+                           (2,'a',1);
+                           (2,'b',1);
+                           (2,'c',1);
+                           (3,'a',2);
+                           (3,'b',2);
+                           (3,'c',2);];
+                  start = 1;
+                  final = [2;3]}
 
-let fa_b : fa = dummy
+
+let fa_b : fa = { states = [1; 2; 3];
+                  alphabet = ['a';'b';'c'];
+                  delta = [(1,'a',2);
+                           (1,'c',1);
+                           (2,'a',3);
+                           (2,'c',2);
+                           (3,'c',3);];
+                  start = 1;
+                  final = [3]}
                         
 
-let fa_c : fa = dummy
+let fa_c : fa = { states = [1; 2; 3; 4; 5; 6];
+                  alphabet = ['a';'b';'c'];
+                  delta = [(1,'a',2);
+                           (1,'b',3);
+                           (1,'c',1);
+                           (2,'a',5);
+                           (2,'b',4);
+                           (2,'c',2);
+                           (3,'a',6);
+                           (3,'c',3);
+                           (4,'a',7);
+                           (4,'c',4);
+                           (5,'b',7);
+                           (5,'c',5);
+                           (6,'a',7);
+                           (6,'c',6);
+                           (7,'c',7);];
+                  start = 1;
+                  final = [7]}
                     
 
-let fa_d : fa = dummy
+let fa_d : fa = { states = [1; 2; 3; 4; 5; 6];
+                  alphabet = ['a';'b';'c'];
+                  delta = [(1,'a',5);
+                           (1,'b',2);
+                           (1,'c',1);
+                           (2,'a',3);
+                           (2,'b',4);
+                           (2,'c',2);
+                           (3,'a',2);
+                           (3,'b',5);
+                           (3,'c',3);
+                           (4,'a',5);
+                           (4,'b',2);
+                           (4,'c',4);
+                           (5,'a',4);
+                           (5,'b',6);
+                           (5,'c',5);
+                           (6,'a',2);
+                           (6,'b',5);
+                           (6,'c',6);];
+                  start = 1;
+                  final = [5]}
 
 
-let fa_e : fa = dummy
+let fa_e : fa = { states = [1; 2; 3; 4; 5; 6; 7; 8; 9];
+                  alphabet = ['a';'b';'c'];
+                  delta = [(1,'a',2);
+                           (1,'b',4);
+                           (1,'c',7);
+                           (2,'a',9);
+                           (2,'b',3);
+                           (2,'c',8);
+                           (3,'a',4);
+                           (3,'b',2);
+                           (3,'c',5);
+                           (4,'a',3);
+                           (4,'b',9);
+                           (4,'c',6);
+                           (5,'a',6);
+                           (5,'b',8);
+                           (6,'a',5);
+                           (6,'b',7);
+                           (7,'a',8);
+                           (7,'b',6);
+                           (8,'a',7);
+                           (8,'b',5);
+                           (9,'a',2);
+                           (9,'b',4);
+                           (9,'c',7);];
+                  start = 1;
+                  final = [8]}
 
               
 
