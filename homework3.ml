@@ -4,9 +4,9 @@ HOMEWORK 3
 
 Due: Wed Feb 23, 2022 (23h59)
 
-Name: 
+Name: Melody Chiu
 
-Email:
+Email: cchiu@olin.edu
 
 Remarks, if any:
 
@@ -31,49 +31,43 @@ Remarks, if any:
 
 (********************* QUESTION 1 *********************)
 
-
 let absNonZero (xs: int list): int list =
-  failwith "Not implemented"
+  List.map (fun x -> abs x) (List.filter (fun x -> x <> 0) xs)
 
-  
 let map_functions (fs: ('a -> 'b) list) (x: 'a) : 'b list =
-  failwith "Not implemented"
+  List.map (fun f -> f x) fs
 
-  
 let compose_all (fs:('a -> 'a) list) (x: 'a) : 'a =
-  failwith "Not implemented"
+  List.fold_right (fun x r -> x r) fs (fun x -> x)
 
-  
 let pairs1 (x: 'a) (ys: 'b list) : ('a * 'b) list =
-  failwith "Not implemented"
+  List.map (fun b -> (x, b)) ys
 
-  
 let pairs (xs:'a list) (ys:'b list) : ('a * 'b) list =
-  failwith "Not implemented"
-
+  let map_b x = List.map (fun b -> (x, b)) ys in
+  List.flatten (List.map (map_b) xs)
 
 
 (********************* QUESTION 2 *********************)
 
   
 let cons_all (x:'a) (xss:'a list list) : 'a list list = 
-  failwith "Not implemented"
+  List.map (fun xs -> match xs with [] -> [x] | xs -> x::xs) xss
 
-  
 let prefixes (xs:'a list) : 'a list list = 
-  failwith "Not implemented"
+  List.fold_right (fun x r -> []::cons_all x r) xs [[]]
 
-  
+let cons_all_opp (x:'a) (xss:'a list list) : 'a list list = 
+  List.map (fun xs -> match xs with [] -> [x] | xs -> xs@[x]) xss
+
 let suffixes (xs:'a list) : 'a list list =
-  failwith "Not implemented"
-
+  List.fold_right (fun x r -> (cons_all_opp x r)@[[]]) (List.rev xs) [[]]
 
 let splits (xs:'a list) : ('a list * 'a list) list =
-  failwith "Not implemented"
-
+  List.map2 (fun x y -> (x, y)) (prefixes xs) (suffixes xs)
   
 let inject (x:'a) (xs:'a list) : 'a list list =
-  failwith "Not implemented"
+  List.map (fun (a,b) ->  a@[x]@b) (splits xs)
 
   
 (* BONUS *)
@@ -167,23 +161,22 @@ let faLastThreeY = {
 
                  
 let has_final (m:fa) (qs:int list):bool =
-  failwith "Not implemented"
+  List.for_all (fun x -> List.mem x qs) m.final
 
-  
 let follow_symbol (m:fa) (q:int) (a:char):int list =
-  failwith "Not implemented"
-
+  List.map (fun (x, y, z) -> z) (List.filter (fun (x, y, z) -> x = q && y = a) m.delta)
   
 let follow_symbol_from_states (m:fa) (qs:int list) (a:char):int list =
-  failwith "Not implemented"
+  List.fold_right (fun x r -> (follow_symbol m x a) @ r) qs []
 
-
-let follow_sequence_from_states (m:fa) (qs:int list) (syms:char list):int list =
-  failwith "Not implemented"
-
+let rec follow_sequence_from_states (m:fa) (qs:int list) (syms:char list):int list =
+  match syms with
+  | [] -> qs
+  | x::xs' -> follow_sequence_from_states m (follow_symbol_from_states m qs x) xs'
 
 let accept (m:fa) (input:string):bool = 
-  failwith "Not implemented"
+  let symbols = explode input in
+  has_final m (follow_sequence_from_states m [m.start] symbols)
 
 
 
