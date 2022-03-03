@@ -285,7 +285,6 @@ let tm_ab3 : tm =
        reject = 666;
        delta = d }
 
-(* works for only even palindromes *)
 let tm_pal : tm =
   let d inp = (match inp with
                | (1, 'a') -> (2, '_', 1)
@@ -299,8 +298,10 @@ let tm_pal : tm =
                | (3, '_') -> (5, '_', -1)
                | (4, 'a') -> (6, '_', -1)
                | (4, 'b') -> (666, 'b', 1)
+               | (4, '_') -> (777, '_', 0)
                | (5, 'a') -> (666, 'a', 1)
                | (5, 'b') -> (7, '_', -1)
+               | (5, '_') -> (777, '_', 0)
                | (6, 'a') -> (6, 'a', -1)
                | (6, 'b') -> (6, 'b', -1)
                | (6, '_') -> (1, '_', 1)
@@ -310,7 +311,7 @@ let tm_pal : tm =
                | (_, c) -> (666, c, 1))
   in { states = [1; 2; 4; 6; 7; 777; 666];
        input_alphabet = ['a';'b'];
-       tape_alphabet = ['a';'b';'X';'Y';'_'];
+       tape_alphabet = ['a';'b';'_'];
        start = 1;
        accept = 777;
        reject = 666;
@@ -351,7 +352,7 @@ let tm_not : tm =
                | (10, '1') -> (666, '1', 1)
                | (10, '#') -> (10, '#', 1)
                | (_, c) -> (777, c, 1))
-  in { states = [1; 2; 4; 6; 7; 8; 9; 10; 777; 666];
+  in { states = [1; 2; 4; 5; 6; 7; 8; 9; 10; 777; 666];
        input_alphabet = ['0';'1'];
        tape_alphabet = ['0';'1';'#';'_'];
        start = 1;
@@ -407,9 +408,9 @@ let tm_and : tm =
                | (22, '1') -> (666, '_', 1)
                | (22, '#') -> (22, '#', 1)
                | (_, c) -> (777, c, 1))
-  in { states = [1; 2; 4; 6; 7; 777; 666];
-       input_alphabet = ['a';'b'];
-       tape_alphabet = ['a';'b';'X';'Y';'_'];
+  in { states = [1; 2; 4; 5; 10; 20; 21; 22 30; 31; 32; 33; 34; 777; 666];
+       input_alphabet = ['a';'b'; '#];
+       tape_alphabet = ['a';'b';'#';'_'];
        start = 1;
        accept = 777;
        reject = 666;
@@ -477,9 +478,9 @@ let tm_plus1 : tm =
                | (44, '#') -> (44, '#', -1)
                | (44, '_') -> (666, '_', 0)
                | (_, c) -> (777, c, 1))
-  in { states = [1; 2; 4; 6; 7; 777; 666];
-       input_alphabet = ['a';'b'];
-       tape_alphabet = ['a';'b';'X';'Y';'_'];
+  in { states = [1; 2; 4; 5; 8; 9; 20; 21; 30; 31; 41; 42; 43; 44; 50; 51; 52; 777; 666];
+       input_alphabet = ['a';'b'; '#];
+       tape_alphabet = ['a';'b';'#';'_'];
        start = 1;
        accept = 777;
        reject = 666;
