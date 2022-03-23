@@ -4,9 +4,9 @@ HOMEWORK 5
 
 Due: Wed Mar 23, 2022 (23h59)
 
-Name: 
+Name: Melody Chiu
 
-Email:
+Email: cchiu@olin.edu
 
 Remarks, if any:
 
@@ -179,29 +179,77 @@ let rec replace_nth (lst: 'a list) (n: int) (s: 'a): 'a list =
            
 
 let start_config (m:tm2) (w:string): config2 =
-  failwith "not implemented"
+  {
+    state = 1;
+    tape1 = explode w;
+    tape2 = [];
+    position1 = 0;
+    position2 = 0;
+  }
 
-  
 let accept_config (m: tm2) (c: config2): bool = 
-  failwith "not implemented"
-
+  c.state = m.accept
   
 let reject_config (m: tm2) (c: config2): bool = 
-  failwith "not implemented"
-
+  c.state = m.reject
 
 let step (m: tm2) (c: config2): config2 = 
-  failwith "not implemented"
+  let tape_length1 = List.length c.tape1 in
+  let tape_length2 = List.length c.tape2 in
+  let tape1 = if c.position1 < tape_length1 then c.tape1
+                                else c.tape1@['_'] in
+  let tape2 = if c.position2 < tape_length2 then c.tape2
+                                else c.tape2@['_'] in
+  match m.delta(c.state, (List.nth tape1 c.position1), (List.nth tape2 c.position2)) with
+  | (x,y1,z1,y2,z2) -> { state = x;
+                         tape1 = replace_nth tape1 c.position1 y1;
+                         tape2 = replace_nth tape2 c.position2 y2;
+                         position1 = max (c.position1 + z1) 0;
+                         position2 = max (c.position2 + z2) 0}
 
-  
 let run (m: tm2) (w: string): bool = 
-  failwith "not implemented"
-
+  let config = start_config m w in
+    let rec loop m c =
+      let _ = print_config  m (step m c) in
+        if accept_config m (step m c) then true
+        else if reject_config m (step m c) then false
+        else loop m (step m c) in
+  loop m config
   
 let tm_anbmcndm : tm2 =
-  (* replace by your actual implementation of the Turing machine *)
-  dummy_tm2
-
+  let d inp = (match inp with
+               | (1, '_', '_') -> (777, '_', 0, '_', 0)
+               | (1, 'a', '_') -> (2, 'a', 0, 'X', 1)
+               | (1, 'b', '_') -> (20, 'b', 0, 'X', 1)
+               | (2, 'a', '_') -> (2, 'a', 1, 'a', 1)
+               | (2, c1, '_') -> (3, c1, 0, '_', -1)
+               | (3, 'b', 'a') -> (3, 'b', 1, 'a', 0)
+               | (3, 'c', 'a') -> (4, 'c', 0, 'a', 0)
+               | (4, 'c', 'a') -> (4, 'c', 1, 'a', -1)
+               | (4, '_', 'X') -> (777, '_', 0, 'X', 0)
+               | (4, 'd', 'X') -> (10, 'd', 0, 'X', 1)
+               | (4, c1, c2) -> (666, c1, 0, c2, 0)
+               | (10, 'd', _) -> (10, 'd', 1, 'd', 1)
+               | (10, '_', _) -> (11, '_', -1, '_', -1)
+               | (11, 'a', 'd') -> (666, 'a', 0, 'd', 0)
+               | (11, 'b', 'd') -> (12, 'b', 0, 'd', 0)
+               | (11, c1, 'd') -> (11, c1, -1, 'd', 0)
+               | (12, 'b', 'd') -> (12, 'b', -1, 'd', -1)
+               | (12, 'a', 'X') -> (777, '_', 0, '_', 0)
+               | (20, 'b', '_') -> (20, 'b', 1, 'b', 1)
+               | (20, 'd', '_') -> (21, 'd', 0, '_', -1)
+               | (21, 'd', 'b') -> (21, 'd', 1, 'b', -1)
+               | (21, '_', 'X') -> (777, '_', 0, 'X', 0)
+               | (_, c1, c2) -> (666, c1, 0, c2, 0))
+  in {
+      states = [1; 2; 3; 4; 10; 11; 12; 777; 666];
+      input_alphabet = ['a';'b'];
+      tape_alphabet = ['a';'b';'X';'_'];
+      start = 1;
+      accept = 777;
+      reject = 666;
+      delta = d
+    }
 
   
 (* QUESTION 2 *)
@@ -210,29 +258,33 @@ let tm_anbmcndm : tm2 =
   
 type ('a, 'b) pfn = 'a -> 'b option
 
-                  
 let null_pfn (): ('a, 'b) pfn = 
-  failwith "not implemented"
+  fun a -> None
 
-  
 let extend_pfn (arg: 'a) (value: 'b) (pfn: ('a, 'b) pfn): ('a, 'b) pfn = 
-  failwith "not implemented"
-
+  fun a -> if a = arg then Option.some value
+                      else pfn a
 
 let join_pfn (pfn1: ('a, 'b) pfn) (pfn2: ('a, 'b) pfn): ('a, 'b) pfn  =
-  failwith "not implemented"
-
+  fun a -> if pfn1 a = None then pfn2 a
+                            else pfn1 a
                                                                                  
 let default_pfn (b: 'b) (pfn: ('a, 'b) pfn): ('a -> 'b) =
-  failwith "not implemented"
-
+  fun a -> if pfn a = None then b
+                           else Option.get (pfn a)
 
 let fail_pfn (pfn: ('a, 'b) pfn): ('a -> 'b) =
-  failwith "not implemented"
-
+  fun a -> if pfn a = None then failwith "undefined"
+                           else Option.get (pfn a)
                                                                         
 let mk_dict (pairs: ('a * 'b) list): ('a -> 'b) =
-  failwith "not implemented"
+  fun a -> let rec loop symbols =
+           match symbols with
+           | [] -> failwith "undefined"
+           | x :: xs' -> match x with (c, d) ->
+                         if a = c then fail_pfn (extend_pfn c d (null_pfn ())) a
+                         else loop xs' in
+           loop pairs
     
 
   
@@ -389,57 +441,235 @@ let p_succ: instruction list = [
 
              
 let p_copy: instruction list = [
-    (* Replace by your own program *)
+    REGISTER ("X", 0);
+    REGISTER ("Y", 1);
+    REGISTER ("Z", 2);
+    LABEL "loop";
+    DEC ("Y", "done");
+    JUMP "loop";
+    LABEL "done";
+    LABEL "loop1";
+    DEC ("X", "done1");
+    INC "Y";
+    INC "Z";
+    JUMP "loop1";
+    LABEL "done1";
+    LABEL "loop2";
+    DEC ("Z", "done2");
+    INC "X";
+    JUMP "loop2";
+    LABEL "done2";
     TRUE;
   ]
 
                              
 let p_swap: instruction list = [
-    (* Replace by your own program *)
+    REGISTER ("X", 0);
+    REGISTER ("Y", 1);
+    REGISTER ("Z", 2);
+    LABEL "loop1";
+    DEC ("X", "done1");
+    INC "Z";
+    JUMP "loop1";
+    LABEL "done1";
+    LABEL "loop2";
+    DEC ("Y", "done2");
+    INC "X";
+    JUMP "loop2";
+    LABEL "done2";
+    LABEL "loop3";
+    DEC ("Z", "done3");
+    INC "Y";
+    JUMP "loop3";
+    LABEL "done3";
     TRUE;
-  ]    
+  ]
 
                              
 let p_plus: instruction list = [
-    (* Replace by your own program *)
-    TRUE;
-  ]        
+    REGISTER ("X", 0);
+    REGISTER ("Y", 1);
+    REGISTER ("Z", 2);
+    LABEL "loop1";
+    DEC ("X", "done1");
+    INC "Y";
+    JUMP "loop1";
+    LABEL "done1";
+    EQUAL ("Y", "Z");
+  ]
 
                              
 let p_sub: instruction list = [
-    (* Replace by your own program *)
-    TRUE;
+    REGISTER ("X", 0);
+    REGISTER ("Y", 1);
+    REGISTER ("Z", 2);
+    LABEL "loop";
+    DEC ("Y", "done");
+    DEC ("X", "done");
+    JUMP "loop";
+    LABEL "done";
+    EQUAL ("X", "Z");
   ]
 
                             
 let p_max: instruction list = [
-    (* Replace by your own program *)
-    TRUE;
+    REGISTER ("X", 0);
+    REGISTER ("Y", 1);
+    REGISTER ("Z", 2);
+    LABEL "loop";
+    DEC ("Z", "done");
+    DEC ("Y", "done1");
+    DEC ("X", "done2");
+    JUMP "loop";
+    LABEL "done1";
+    DEC ("X", "done2");
+    EQUAL ("X", "Z");
+    LABEL "done2";
+    EQUAL ("Y", "Z");
+    LABEL "done";
+    DEC ("Y", "done1");
+    DEC ("X", "done2");
+    FALSE;
   ]
             
            
 let p_diff: instruction list = [
-    (* Replace by your own program *)
+    REGISTER ("X", 0);
+    REGISTER ("Y", 1);
+    REGISTER ("Z", 2);
+    LABEL "loop";
+    DEC ("Y", "done1");
+    DEC ("X", "done2");
+    JUMP "loop";
+    LABEL "done1";
+    EQUAL ("X", "Z");
+    LABEL "done2";
+    INC "Y";
+    EQUAL ("Y", "Z");
     TRUE;
   ]
-               
 
-               
+
+
   
 let p_times: instruction list = [
-    (* Replace by your own program *)
-    TRUE;
+    REGISTER ("X", 0);
+    REGISTER ("Y", 1);
+    REGISTER ("Z", 2);
+    REGISTER ("A", 3);
+    REGISTER ("B", 4);
+    LABEL "loop1";
+    DEC ("X", "done");
+    LABEL "loop2";
+    DEC ("Y", "next");
+    INC "A";
+    INC "B";
+    JUMP "loop2";
+    LABEL "next";
+    DEC ("X", "done");
+    LABEL "loop3";
+    DEC ("A", "loop1");
+    INC "Y";
+    INC "B";
+    JUMP "loop3";
+    LABEL "done";
+    EQUAL ("B", "Z");
   ]
-
-                              
+                          
 let p_square: instruction list = [
-    (* Replace by your own program *)
-    TRUE;
+    REGISTER ("X", 0);
+    REGISTER ("Y", 1);
+    REGISTER ("Z", 2);
+    REGISTER ("A", 3);
+    REGISTER ("B", 4);
+
+    (* Copy "X" into "C" *)
+    REGISTER ("C", 5);
+    LABEL "l1";
+    DEC ("X", "d1");
+    INC "Z";
+    INC "C";
+    JUMP "l1";
+    LABEL "d1";
+    LABEL "l2";
+    DEC ("C", "d2");
+    INC "X";
+    JUMP "l2";
+
+    LABEL "d2";
+    LABEL "loop1";
+    DEC ("X", "done");
+    LABEL "loop2";
+    DEC ("Z", "next");
+    INC "A";
+    INC "B";
+    JUMP "loop2";
+    LABEL "next";
+    DEC ("X", "done");
+    LABEL "loop3";
+    DEC ("A", "loop1");
+    INC "Z";
+    INC "B";
+    JUMP "loop3";
+    LABEL "done";
+    EQUAL ("B", "Y");
   ]
 
 
 let p_square_x_2: instruction list = [
-    (* Replace by your own program *)
-    TRUE;
+    REGISTER ("X", 0);
+    REGISTER ("Y", 1);
+    REGISTER ("Z", 2);
+    REGISTER ("A", 3);
+    REGISTER ("B", 4);
+
+    (* Copy "X" into "C" *)
+    REGISTER ("C", 5);
+    LABEL "l1";
+    DEC ("X", "d1");
+    INC "Z";
+    INC "C";
+    JUMP "l1";
+    LABEL "d1";
+    LABEL "l2";
+    DEC ("C", "d2");
+    INC "X";
+    JUMP "l2";
+
+    LABEL "d2";
+    LABEL "loop1";
+    DEC ("X", "done");
+    LABEL "loop2";
+    DEC ("Z", "next");
+    INC "A";
+    INC "B";
+    JUMP "loop2";
+    LABEL "next";
+    DEC ("X", "done");
+    LABEL "loop3";
+    DEC ("A", "loop1");
+    INC "Z";
+    INC "B";
+    JUMP "loop3";
+    LABEL "done";
+
+    (* Add "A" to "B" *)
+    LABEL "add_loop";
+    DEC ("A", "done_add");
+    INC "B";
+    JUMP "add_loop";
+
+    (* Add "Z" to "B" *)
+    LABEL "done_add";
+    LABEL "add_loop2";
+    DEC ("Z", "done_add2");
+    INC "B";
+    JUMP "add_loop2";
+
+    (* Add 2 to "B" *)
+    LABEL "done_add2";
+    INC "B";
+    INC "B";
+    EQUAL ("B", "Y"); 
   ]
             
