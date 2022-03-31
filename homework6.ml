@@ -4,9 +4,9 @@ HOMEWORK 6
 
 Due: Thu Mar 31, 2022 (23h59)
 
-Name: 
+Name: Melody Chiu
 
-Email:
+Email: cchiu@olin.edu
 
 Remarks, if any:
 
@@ -275,19 +275,61 @@ let dummy_grammar = {
 } 
 
 
-let q1_amnbmcn = dummy_grammar
+let q1_amnbmcn = {
+  nonterms = ["S"; "T"; "U"];
+  terms = ["a"; "b"];
+  rules = [ ("S", "TU");
+            ("TU", "aTUc");
+            ("TU", "aTUb");
+            ("TU", "")];
+  start = "S"
+}
 
                
-let q1_ambmncn = dummy_grammar
+let q1_ambmncn = {
+  nonterms = ["S"; "T"; "U"];
+  terms = ["a"; "b"];
+  rules = [ ("S", "TU");
+            ("T", "aTb");
+            ("T", "");
+            ("U", "bUc");
+            ("U", "")];
+  start = "S"
+}
 
                
-let q1_a2mbncmn = dummy_grammar
+let q1_a2mbncmn = {
+  nonterms = ["S"; "T"; "U"];
+  terms = ["a"; "b"];
+  rules = [ ("S", "TU");
+            ("TU", "aaTUc");
+            ("TU", "bTUc");
+            ("TU", "")];
+  start = "S"
+}
 
                 
-let q1_equal = dummy_grammar
+let q1_equal = {
+  nonterms = ["S"; "T"; "U"];
+  terms = ["a"; "b"];
+  rules = [ ("S", "TU");
+            ("TU", "aTUb");
+            ("TU", "bTUa");
+            ("TU", "");
+            ("ab", "ba");
+            ("ba", "ab")];
+  start = "S"
+}
 
              
-let q1_addition = dummy_grammar
+let q1_addition = {
+  nonterms = ["S"; "T"; "U"];
+  terms = ["a"; "b"];
+  rules = [ ("S", "+=");
+            ("+=", "1+=1");
+            ("=", "1=1")];
+  start = "S"
+}
 
 
 (*
@@ -296,25 +338,58 @@ let q1_addition = dummy_grammar
  *)
   
 
-let q2_anbncndn = dummy_grammar
-           
-                
+let q2_anbncndn = {
+  nonterms = ["S"; "A"; "B"; "C"; "X"];
+  terms = ["a"; "b"; "c"; "d"];
+  rules = [ ("S", "");
+            ("S", "ABd");
+            ("AB", "AABd");
+            ("B", "XbBc");
+            ("B", "");
+            ("AX", "a");
+            ("aX", "Xa");
+            ("bX", "Xb") ];
+  start = "S"
+}
+
 (* please put your sequence of rewrites for the string aabbccdd here *)
 
-let rewrites_q2_anbncndn_2 = ["dummy_rewrite"]
+let rewrites_q2_anbncndn_2 = ["S"; "ABd"; "AABdd"; "AAXbBcdd"; "AAXbXbBccdd"; "AAXbXbccdd"]
    
 (* please put your sequence of rewrites for the string aaabbbcccddd here *)
 
-let rewrites_q2_anbncndn_3 = ["dummy_rewrite"]
+let rewrites_q2_anbncndn_3 = ["S"; "ABd"; "AABdd"; "AAABddd"; "AAAXbBcddd"; "AAAXbXbBccddd"; "AAAXbXbXbBcccddd"; "AAAXbXbXbcccddd"]
+
+let rewrites_q2_anbncndn_4 = ["S"; "ABd"; "AABdd"; "AAABddd"; "AAAABdddd"; "AAAAXbBcdddd"; "AAAAXbXbBccdddd"; "AAAAXbXbXbBcccdddd"; "AAAAXbXbXbXbBccccdddd"; "AAAAXbXbXbXbccccdddd"]
 
 
-let q2_straddle = dummy_grammar
+let q2_straddle = {
+  nonterms = ["S"; "A"; "B"; "X"; "Y"; "T"; "U"];
+  terms = ["a"; "b"];
+  rules = [ ("S", "TU");
+            ("T", "aTA");
+            ("T", "bTB");
+            ("U", "XUa");
+            ("U", "YUb");
+            ("T", ">");
+            ("U", "<");
+            (">BY", "b>");
+            (">AX", "a>");
+            ("><", "");
+            ("AY", "YA");
+            ("BY", "YB");
+            ("XY", "YX");
+            ("BX", "XB");
+            ("YX", "XY");
+            ("AX", "XA");];
+  start = "S"
+}
                 
   
 (* please put your sequence of rewrites for the string abaabaaba here *)
 
-let rewrites_q2_straddle_aba = ["dummy_rewrite"]
+let rewrites_q2_straddle_aba = ["S"; "TU"; "aTAU"; "abTBAU"; "abaTABAU"; "aba>ABAU"; "aba>ABAXUa"; "aba>ABAXYUba"; "aba>ABAXYXUaba"; "aba>ABAXYX<aba"; "aba>ABXAYX<aba"; "aba>AXBAYX<aba"; "abaa>BAYX<aba"; "abaa>BYAX<aba"; "abaab>AX<aba"]
    
 (* please put your sequence of rewrites for the string abbbbbbaabbb here *)
 
-let rewrites_q2_straddle_abbb = ["dummy_rewrite"]
+let rewrites_q2_straddle_abbb = ["S"; "TU"; "aTAU"; "abTBAU"; "abbTBBAU"; "abbbTBBBAU"; "abbb>BBBAU"; "abbb>BBBAYUb"; "abbb>BBBAYYUbb"; "abbb>BBBAYYYUbbb"; "abbb>BBBAYYYXUabbb"; "abbb>BBBAYYYX<abbb"; "abbb>BBBYAYYX<abbb"; "abbb>BBYBAYYX<abbb"; "abbb>BYBBAYYX<abbb"; "abbbb>BBAYYX<abbb"; "abbbb>BBYAYX<abbb"; "abbbb>BYBAYX<abbb"; "abbbbb>BAYX<abbb"; "abbbbb>BYAX<abbb"; "abbbbbb>AX<abbb"]
