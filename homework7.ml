@@ -4,9 +4,9 @@ HOMEWORK 7
 
 Due: Thu Apr 7, 2022 (23h59)
 
-Name: 
+Name: Melody Chiu
 
-Email:
+Email: cchiu@olin.edu
 
 Remarks, if any:
 
@@ -300,21 +300,21 @@ let q12_defs = [
      *
      *************************************************************)
 
-    ("and", "not_implemented");
+    ("and", "<a -> < b -> a b a>>");
 
-    ("or", "not_implemented");
+    ("or", "<a -> < b -> a a b>>");
 
-    ("not", "not_implemented");
+    ("not", "<b -> if b false true>");
     
-    ("minus", "not_implemented");
+    ("minus", "<m -> <n -> n pred m>>");
     
-    ("ge", "not_implemented");
+    ("ge", "<m -> <n -> if (iszero (minus n m)) true false>>");
 
-    ("gt", "not_implemented");
+    ("gt", "<m -> <n -> if not (iszero (minus m n)) true false>>");
     
-    ("max", "not_implemented");
+    ("max", "<m -> <n -> if (iszero (minus n m)) m n>>");
 
-    ("min", "not_implemented");
+    ("min", "<m -> <n -> if (iszero (minus n m)) n m>>");
 
 
     (*************************************************************
@@ -322,14 +322,14 @@ let q12_defs = [
      *
      *************************************************************)
     
-    ("int", "not_implemented");
+    ("int", "< x -> pair true x >");
     
-    ("neg_int", "not_implemented");
+    ("neg_int", "< a -> pair (not (first a)) (second a)>");
 
-    ("abs", "not_implemented");
-    
-    ("plus_int", "not_implemented");
+    ("abs", "< a -> pair true (second a)>");
 
-    ("times_int", "not_implemented");
+    ("plus_int", "<m -> <n -> if (ge (second m) (second n)) (if (not (first m)) (if (not (first n)) (pair false (plus (second m) (second n))) (pair false (minus (second m) (second n)))) (if (not (first n)) (pair true (minus (second m) (second n))) (pair true (plus (second m) (second n))))) (if (not (first m)) (if (not (first n)) (pair false (plus (second m) (second n))) (pair true (minus (second n) (second m)))) (if (not (first n)) (pair false (minus (second n) (second m))) (pair true (plus (second m) (second n)))))>>");
+
+    ("times_int", "<m -> <n -> if (or (and (first m) (first n)) (and (not (first m)) (not (first n)))) (pair true (times (second m) (second n))) (pair false (times (second m) (second n))) >>");
 
   ]    
