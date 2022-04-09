@@ -4,9 +4,9 @@ HOMEWORK 8
 
 Due: Thu Apr 14, 2022 (23h59)
 
-Name: 
+Name: Melody Chiu
 
-Email:
+Email: cchiu@olin.edu
 
 Remarks, if any:
 
@@ -307,29 +307,32 @@ let simplify defs term = Lambda.simplify' (fun t -> ()) (default_defs@defs) term
 
 let q12_defs = [
 
-    (*************************************************************
-     * Question 1
-     *************************************************************)
 
-    ("case_option", "not_implemented");
+
+    ("case_option", "<a -> <b -> <c -> a b c>>>");
     
-    ("default", "not_implemented");
+    ("default", "<y -> <z -> y <x -> x> z>>");
     
-    ("compose", "not_implemented");
+    ("compose", "<f -> <g -> <x -> case_option (case_option x g none) f none>>>");
     
-    ("either", "not_implemented");
+    ("either", "<f -> <g -> <x -> default (f x) (g x)>>>");
     
     (*************************************************************
      * Question 2
      *************************************************************)
 
-    ("match_list", "not_implemented");
+    ("match_list", "<lst -> <a -> <f -> lst (pair a f)>>>");
     
-    ("sum", "not_implemented");
-    
-    ("map", "not_implemented");
+    ("sum", "Theta <x -> <lst -> match_list lst _0 (<h -> <t -> plus h (x (t))>>)>>");
 
-    ("nth", "not_implemented");
+    ("map", "Theta <x -> <f -> <lst -> match_list lst empty (<h -> <t -> cons (f h) (x f t)>>)>>>");
+
+    ("nth", "Theta <x -> <n -> <lst -> match_list lst false (<h -> <t -> if (iszero n) (h) (x (pred n) t)>>)>>>");
     
   ]
-    
+
+    (*************************************************************
+     * "sum", "Theta <lst -> match_list lst _0 <h -> <t -> plus h (lst (t)))>>>"
+     * "sum", "Theta <x -> <lst -> match_list _0 <h -> <t -> plus h (lst (t)))>>>>"
+     * "sum", "<lst -> Theta <x -> <match_list lst _0 <h -> <t -> _0 (plus h ((pred x) t))>>>>>"
+     *************************************************************)
