@@ -330,9 +330,3 @@ let q12_defs = [
     ("nth", "Theta <x -> <n -> <lst -> match_list lst false (<h -> <t -> if (iszero n) (h) (x (pred n) t)>>)>>>");
     
   ]
-
-    (*************************************************************
-     * "sum", "Theta <lst -> match_list lst _0 <h -> <t -> plus h (lst (t)))>>>"
-     * "sum", "Theta <x -> <lst -> match_list _0 <h -> <t -> plus h (lst (t)))>>>>"
-     * "sum", "<lst -> Theta <x -> <match_list lst _0 <h -> <t -> _0 (plus h ((pred x) t))>>>>>"
-     *************************************************************)
