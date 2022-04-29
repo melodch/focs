@@ -4,9 +4,9 @@ HOMEWORK 9
 
 Due: Thu Apr 28, 2022 (23h59)
 
-Name: 
+Name: Melody Chiu
 
-Email:
+Email: cchiu@olin.edu
 
 Remarks, if any:
 
@@ -270,6 +270,10 @@ let add = network ["input1";"input2"] "result" [
               ("result", map2 (fun x y -> x+y) "input1" "input2")
             ]
 
+let addf = network ["input1";"input2"] "result" [
+              ("result", map2 (fun x y -> x+.y) "input1" "input2")
+            ]
+
 let squares = network [] "result" [
                   ("result", component add ["odds"; "fby"]);
                   ("odds", component odds []);
@@ -313,15 +317,49 @@ let dummyFloatNetwork : float network = network [] "result" []
  *
  *)
 
-let mult : int network = dummyIntNetwork
+let mult : int network = network ["input1";"input2"] "result" [
+              ("result", map2 (fun x y -> x*y) "input1" "input2")
+            ]
 
-let scale (n:int) : int network = dummyIntNetwork
+let mult : float network = network ["input1";"input2"] "result" [
+              ("result", map2 (fun x y -> x*.y) "input1" "input2")
+            ]
 
-let mult1 : int network = dummyIntNetwork
+let scale (n:int) : int network = network ["input"] "result" [
+              ("result", map (fun x -> x*n) "input")
+            ]
 
-let mult2 : int network = dummyIntNetwork
+let scalef (n:float) : float network = network ["input"] "result" [
+              ("result", map (fun x -> x*.n) "input")
+            ]
 
-let running_max : int network = dummyIntNetwork
+let rep : int network = network ["input1"] "result" [
+              ("result", fby "input1" "a");
+              ("a", map (fun x -> x) "result")
+            ]
+
+let mult1 : int network = network ["input1";"input2"] "result" [
+              ("result", map2 (fun x y -> x*y) "a" "input1");
+              ("a", component rep ["input2"])
+            ]
+
+let mult2 : int network = network ["input1";"input2"] "result" [
+              ("result", map2 (fun x y -> x*y) "input1" "rep2_stream");
+              ("a", drop "input2");
+              ("b", fby "input2" "r");
+              ("r", fby "a" "b");
+              ("rep2_stream", fby "input2" "r")
+            ]
+
+let maxcomp : int network = network ["input1"; "input2"] "result" [
+              ("result", map2 (fun x y -> max x y) "input1" "input2")
+            ]
+
+let running_max : int network = network ["s"] "result" [
+              ("result", fby "s" "a");
+              ("b", drop "s");
+              ("a", component maxcomp ["result"; "b"])
+            ]
 
                               
 (*
@@ -331,13 +369,38 @@ let running_max : int network = dummyIntNetwork
  *
  *)
 
-let zero1One1 : int network = dummyIntNetwork
+let zero1One1 : int network = network [] "result" [
+              ("a", drop "input0");
+              ("b", fby "input1" "result");
+              ("result", fby "a" "b");
+              ("input0", cst 0);
+              ("input1", cst 1)
+            ]
 
-let zero2One1 : int network = dummyIntNetwork
+let zero2One1 : int network = network [] "result" [
+              ("a", drop "input0");
+              ("b", fby "input1" "result");
+              ("c", fby "a" "b");
+              ("result", fby "input0" "c");
+              ("input0", cst 0);
+              ("input1", cst 1)
+            ]
 
-let zeroNOne1 (n:int) : int network = dummyIntNetwork
 
-let zeroNOneM (n:int) (m:int) : int network = dummyIntNetwork
+let zeroNOne1 (n:int) : int network = network [] "result" [
+              ("zeros", cst 0);
+              ("r", map (fun x -> (x+1) mod (n+1)) "s");
+              ("s", fby "zeros" "r");
+              ("result", map (fun x -> if x < n then 0 else 1) "s");
+            ]
+
+
+let zeroNOneM (n:int) (m:int) : int network = network [] "result" [
+              ("zeros", cst 0);
+              ("r", map (fun x -> (x+1) mod (n+m)) "s");
+              ("s", fby "zeros" "r");
+              ("result", map (fun x -> if x < n then 0 else 1) "s");
+            ]
 
   
 (*
@@ -347,16 +410,61 @@ let zeroNOneM (n:int) (m:int) : int network = dummyIntNetwork
  *
  *)
 
-let arctan (z:float): float network = dummyFloatNetwork
+let evensf = network [] "result" [
+                ("input", cst 0.0);
+                ("result", fby "input" "add2");
+                ("add2", map (fun x->x+.2.0) "result")
+              ]
+
+let oddsf = network [] "result" [
+               ("input", component evensf []);
+               ("result", map (fun x -> x+.1.0) "input")
+             ]
+
+let pos1neg1f : float network = network [] "result" [
+              ("a", drop "inputpos");
+              ("b", fby "inputneg" "result");
+              ("result", fby "a" "b");
+              ("inputpos", cst 1.0);
+              ("inputneg", cst (-1.0))
+            ]
+
+let arctan (z:float): float network = network [] "result" [
+              ("feedback", map2 (fun x y -> x+.y) "drop" "result");
+              ("drop", drop "stream");
+              ("result", fby "stream" "feedback");
+              ("stream", map2 (fun x y -> (y*.(Float.pow z x)/.x)) "odds_stream" "pos1neg1stream");
+              ("odds_stream", component oddsf []);
+              ("pos1neg1stream", component pos1neg1f [])
+            ]
+
+let pi : float network = network [] "result" [
+              ("result", map2 (fun x y -> 16.0 *. x -. 4.0 *. y) "stream1" "stream2");
+              ("stream1", component (arctan (1.0/.5.0)) []);
+              ("stream2", component (arctan (1.0/.239.0)) [])
+            ]
 
 
-let pi : float network = dummyFloatNetwork
+let newton (f : float -> float) (df : float -> float) (guess: float): float network = network [] "result" [
+              ("feedback", map (fun x -> x-.((f x)/.(df x))) "result");
+              ("result", fby "stream" "feedback");
+              ("stream", cst guess)
+            ]
 
+let natsf = network [] "result" [
+               ("input", cst 0.0);
+               ("result", fby "input" "add1");
+               ("add1", map (fun x->x+.1.0) "result")
+             ]
 
-let newton (f : float -> float) (df : float -> float) (guess: float): float network = dummyFloatNetwork
-
-
-let derivative (f:float -> float) (x:float): float network = dummyFloatNetwork
+let derivative (f:float -> float) (x:float): float network = network [] "result" [
+              ("result", map (fun y -> (f (x+.(1.0/.y)) -. f x) /. (1.0/.y)) "nats_stream");
+              ("stream", cst ((f (x+.1.0) -. f x) /. 1.0));
+              ("nats_stream", component natsf [])
+            ]
 
                                                            
-let limit (epsilon:float): float network = dummyFloatNetwork
+let limit (epsilon:float): float network = network ["s"] "result" [
+              ("drop", drop "s");
+              ("result", filter (fun x y -> abs_float(x -. y) < epsilon) "drop" "s")
+            ]
